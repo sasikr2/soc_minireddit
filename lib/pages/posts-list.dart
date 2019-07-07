@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
 
-class CommuntiesPage extends StatefulWidget{
+class PostListPage extends StatefulWidget{
   @override
   State<StatefulWidget> createState() {
-   
-    return _CommuntiesPage();
+    // TODO: implement createState
+    return _PostListPage();
   }
-}
+} 
 
-class _CommuntiesPage extends State<CommuntiesPage>{
+class _PostListPage extends State<PostListPage>{  
   @override
   Widget build(BuildContext context) {
     return null;
-  }  
-
+  }
 }
-

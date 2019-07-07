@@ -5,21 +5,13 @@ import 'dart:async';
 import 'dart:convert';
 import '../model/user.dart';
 import '../model/auth.dart';
-import '../model/community.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
-class CommunityModel extends Model{
-  List<Community> communties = [];
-
-  List<Community> get allCommunities{
-    return this.communties;
-  }
-}
 
 class UserModel extends Model{
   User _authenticatedUser;
-
+  User get user {
+    return _authenticatedUser;
+  }
   bool isLoading = false;
   notifyListeners();
   void login(String email, String password){
@@ -52,9 +44,14 @@ class UserModel extends Model{
     if(responseData.containsKey('idToken')){
       hasError = false;
       message = 'Authentication Succeeded';
-      _authenticatedUser = User(id: responseData['localId'],email: responseData['email'],token:responseData['idToken']);
-      final SharedPreferences prem =await SharedPreferences.getInstance();
+      _authenticatedUser = User(
+        id: responseData['localId'],
+        email: responseData['email'],
+        token:responseData['idToken']);
+      final SharedPreferences prem = await SharedPreferences.getInstance();
       prem.setString('token',responseData['tokenId']);
+      prem.setString('userEmail',responseData['email']);
+      prem.setString('userId',responseData['localId']);
     }
     else if(responseData['error']['message'] == 'EMAIL_EXISTS'){
       message = 'This email already exists';
@@ -67,8 +64,19 @@ class UserModel extends Model{
     isLoading = false;
     notifyListeners();
     print(json.decode(response.body));
-    return {'success':!hasError ,'message': message};
-    
-
+    return {'success':!hasError,'message': message};
   } 
+  void autoAuthenticate() async{
+    final SharedPreferences prem = await SharedPreferences.getInstance();
+    final String token = prem.getString('token');
+    if(token != null){
+      final String userEmail = prem.getString('userEmail');
+      final String userId = prem.getString('userId');
+      _authenticatedUser = User(email: userEmail, id: userId, token: token);
+      notifyListeners();
+    }
+  }
+
+  
+
 }

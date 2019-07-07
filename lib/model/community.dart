@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import './post.dart';
 
 class Community {
+  String id;
   String name;
   String about;
   bool join;
-  var numofMemb ;
+  int numofMemb ;
   List<Post> posts = [];
-  Community({@required this.name, @required this.about,@required this.numofMemb,this.join,@required this.posts});
+  Community({@required this.id,@required this.name, @required this.about, this.numofMemb,this.join, this.posts});
 }

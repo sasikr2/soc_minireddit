@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
-import '../scoped-model/usermodel.dart';
+import '../scoped-model/main.dart';
 import '../model/auth.dart';
 class AuthenPage extends StatefulWidget{
   @override
@@ -153,7 +153,7 @@ class _AuthenPage extends State<AuthenPage>{
                           ? AuthMode.Signup : AuthMode.Login;
                     });
                   },),
-                  ScopedModelDescendant<UserModel>(builder : (BuildContext context,Widget child, UserModel model){
+                  ScopedModelDescendant<MainModel>(builder : (BuildContext context,Widget child, MainModel model){
                     return model.isLoading
                             ? CircularProgressIndicator():RaisedButton(
                     textColor:Colors.lightGreen,
