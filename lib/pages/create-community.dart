@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:minireddit/model/comment.dart';
-import 'package:minireddit/pages/community-list.dart';
+import '../model/comment.dart';
+import '../pages/community-list.dart';
 import '../scoped-model/main.dart';
 import 'package:scoped_model/scoped_model.dart';
 import '../model/community.dart';
 
 class CommunityCreatePage extends StatefulWidget{
+  final MainModel model;
+  CommunityCreatePage(this.model);
   @override
   State<StatefulWidget> createState() {
     
@@ -61,10 +63,10 @@ class _CommunityCreatePage extends State<CommunityCreatePage>{
       _formData['about'],
       0,
       false,
-      null
+      []
     ).then((bool success){
       if( success)
-         Navigator.push(context,MaterialPageRoute(builder: (BuildContext context) => CommunityListPage()));
+         Navigator.push(context,MaterialPageRoute(builder: (BuildContext context) => CommunityListPage(widget.model)));
       else{
       showDialog(
               context: context,

@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:scoped_model/scoped_model.dart';
-
 import '../scoped-model/main.dart';
+import 'package:scoped_model/scoped_model.dart';
 import '../scoped-model/usermodel.dart';
 import '../model/community.dart';
 
-class CommunityListPage extends StatefulWidget{
-
+class CommunitySelectPage extends StatefulWidget{
   final MainModel model;
-  CommunityListPage(this.model);
+  CommunitySelectPage(this.model);
   @override
   State<StatefulWidget> createState() {
-    return _CommunityListPage();
+    return _CommunitySelectPage();
   }
 }
 
-class _CommunityListPage extends State<CommunityListPage>{
-  
+class _CommunitySelectPage extends State<CommunitySelectPage>{
+  @override
+  void initState() {
+    widget.model.fetchCommunity();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     
@@ -24,17 +26,18 @@ class _CommunityListPage extends State<CommunityListPage>{
       model.isLoading = false;
       return Scaffold(
         appBar: AppBar(
-          title: Text('All Community'),
+          title: Text('Select Community'),
         ),
         body:ListView.builder(
         itemBuilder: (BuildContext context, int index){
            return Padding(
              padding: const EdgeInsets.all(8.0),
              child: Column(children: <Widget>[
-                ListTile(
-                  title: Text(model.allCommunities[index].name),
-                  subtitle: Text(model.allCommunities[index].about),
-                ),Divider(),
+                GestureDetector(child: Text(model.allCommunities[index].name),
+                onTap: (){
+                    Navigator.pop(context,model.allCommunities[index]);
+                },),
+                Divider(),
               ],
           ),
            );

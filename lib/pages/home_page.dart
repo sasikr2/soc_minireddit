@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:minireddit/pages/community-list.dart';
+import '../pages/community-list.dart';
 import 'package:scoped_model/scoped_model.dart';
 import './create-community.dart';
+import './create-post.dart';
 import './community-list.dart';
 import '../widgets/ui_elements/title_default.dart';
 import '../scoped-model/main.dart';
@@ -19,7 +20,7 @@ class HomePage extends StatefulWidget{
 class _HomePage extends State<HomePage>{
   @override
   void initState() {
-    widget.model.fetchCommunity();
+    widget.model.fetchPost();
     super.initState();
   }
   
@@ -34,19 +35,28 @@ class _HomePage extends State<HomePage>{
           leading: Icon(Icons.pages),
           title:Text('Create Community'),
           onTap: (){
-            Navigator.push(context,MaterialPageRoute(builder: (BuildContext context) => CommunityCreatePage()));
+            Navigator.push(context,MaterialPageRoute(builder: (BuildContext context) => CommunityCreatePage(widget.model)));
           },  
         ),
         ListTile(
           leading: Icon(Icons.save_alt),
-          title:Text('Saved'),
-          onTap: (){},
+          title:Text('Recent Posts'),
+          onTap: (){
+            Navigator.pushReplacementNamed(context, '/Postlist');
+          },
         ),
         ListTile(
           leading: Icon(Icons.edit),
           title:Text('Edit Profile'),
           onTap: (){
 
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.edit),
+          title:Text('Create Post'),
+          onTap: (){
+            Navigator.push(context,MaterialPageRoute(builder: (BuildContext context) => PostCreatePage(widget.model)));
           },
         ),
       
@@ -70,7 +80,7 @@ class _HomePage extends State<HomePage>{
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length:1,
+      length:2,
       child:Scaffold(
         drawer: _buildSideDrawer(context),
         appBar: AppBar(
@@ -92,7 +102,7 @@ class _HomePage extends State<HomePage>{
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    TitleDefault(model.allCommunities[index].name),
+                    TitleDefault(model.allPosts[index].title),
                     SizedBox(
                       width: 8.0,
                     ),
@@ -100,7 +110,7 @@ class _HomePage extends State<HomePage>{
                 ),
               );
             },
-            itemCount: model.allCommunities.length,
+            itemCount: model.allPosts.length,
           ),);
           },) 
         )

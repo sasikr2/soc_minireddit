@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import './comment.dart';
 
 class Post {
-  dynamic content;
+  final String id; 
+  final String communityid;
+  String  title;
+  var content;
   num vote;
   List<Comment> comments = [];
   
-  Post({@required this.content,@required this.vote,@required this.comments});
+  Post({ this.id,@required this.communityid,@required this.title,@required this.content,@required this.vote, this.comments});
 }

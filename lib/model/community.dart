@@ -7,6 +7,5 @@ class Community {
   String about;
   bool join;
   int numofMemb ;
-  List<Post> posts = [];
-  Community({@required this.id,@required this.name, @required this.about, this.numofMemb,this.join, this.posts});
+  Community({@required this.id,@required this.name, @required this.about, this.numofMemb,this.join});
 }
