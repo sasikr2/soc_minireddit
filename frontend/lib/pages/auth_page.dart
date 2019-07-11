@@ -48,7 +48,6 @@ class _AuthenPage extends State<AuthenPage>{
             actions: <Widget>[
               FlatButton(
                 child: Text('Okay'),
-
                 onPressed: () {
                   Navigator.of(context).pop();
                 }

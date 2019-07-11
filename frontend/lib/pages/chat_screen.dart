@@ -9,12 +9,12 @@ class ChatScreen extends StatefulWidget {
   final MainModel model;
   ChatScreen(this.model);
   @override
-  _ChatScreenState createState() => _ChatScreenState(model);
+  State<StatefulWidget> createState() {
+    return _ChatScreenState();
+  }
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final MainModel model;
-  _ChatScreenState(this.model);
 
   @override
   void initState() {
@@ -50,19 +50,19 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _bar(BuildContext context) {
     return AppBar(
         title: new Text(
-          model.user.id,
+          widget.model.user.id,
         ),
         centerTitle: true,
       );
   }
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return ScopedModelDescendant(builder:(BuildContext context,Widget child,MainModel model){
+          return Container(
       child: Scaffold(
         drawer: _drawer(context),
         appBar: _bar(context),
-        body:ScopedModelDescendant(builder:(BuildContext context,Widget child,MainModel model){
-          return ListView.builder(
+         body:ListView.builder(
         itemBuilder: (BuildContext context, int index){
            return Padding(
              padding: const EdgeInsets.all(8.0),
@@ -74,14 +74,13 @@ class _ChatScreenState extends State<ChatScreen> {
            );
         },
         itemCount: model.allMessages.length,
-      );
-        }),
+      ),
         bottomNavigationBar: BottomAppBar(
-          child:RaisedButton(onPressed: () { model.sendMessage('Hello Satvik');
-          model.fetchMessage();},
+          child:RaisedButton(onPressed: () { model.sendMessage('Hello Satvik');},
           child: Text('Fixed Send'))
         ),
       ),
     );
+  });
   }
 }

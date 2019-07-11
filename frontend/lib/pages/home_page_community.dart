@@ -21,7 +21,7 @@ class CommunityHomePage extends StatefulWidget{
 class _CommunityHomePage extends State<CommunityHomePage> {
   @override
   void initState() {
-    widget.model.fetchPost();
+    widget.model.fetchCommunity();
     super.initState();
   }
 
@@ -71,7 +71,9 @@ class _CommunityHomePage extends State<CommunityHomePage> {
         ListTile(
           leading: Icon(Icons.search),
           title:Text('Find Community to follow'),
-          onTap: (){},
+          onTap: (){
+            
+          },
         ),
         ListTile(
           leading: Icon(Icons.feedback),

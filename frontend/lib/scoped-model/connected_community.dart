@@ -93,46 +93,45 @@ class CommunityModel extends ConnectedCommunityModel{
 
 
   /////////////
-Future<Null> fetchCommunity ()async{
-  _isLoading = true;
-  notifyListeners();
-  try{
-    final http.Response response =await http.get('https://minireddit-1803c.firebaseio.com/community.json');
-    final List<Community> fetchedCommunties = [];
-    final Map<String,dynamic> communityListData = json.decode(response.body);
-    if(communityListData == null){
+  Future<Null> fetchCommunity ()async{
+    _isLoading = true;
+    notifyListeners();
+    try{
+      final http.Response response =await http.get('https://minireddit-1803c.firebaseio.com/community.json');
+      final List<Community> fetchedCommunties = [];
+      final Map<String,dynamic> communityListData = json.decode(response.body);
+      if(communityListData == null){
+        _isLoading = false;
+        notifyListeners();
+        return ;
+      }
+
+      communityListData.forEach((String communityId,dynamic data){      
+        final Community community = Community(
+          id: communityId,
+          name: data['name'],
+          about: data['about'],
+          numofMemb: data['numofMemb'],
+          join:data['join'],
+          //posts: data['posts'],
+          );
+          fetchedCommunties.add(community);
+      });
+      _communities=fetchedCommunties;
       _isLoading = false;
       notifyListeners();
-      return ;
+
+    }    
+      catch(error){
+        _isLoading=false;
+        notifyListeners();
+        return;
+      }  
     }
-
-    communityListData.forEach((String communityId,dynamic data){
-      
-      final Community community = Community(
-        id: communityId,
-        name: data['name'],
-        about: data['about'],
-        numofMemb: data['numofMemb'],
-        join:data['join'],
-        //posts: data['posts'],
-        );
-        fetchedCommunties.add(community);
-    });
-    _communities=fetchedCommunties;
-    _isLoading = false;
-    notifyListeners();
-
-  }    
-    catch(error){
-      _isLoading=false;
-      notifyListeners();
-      return;
-    }  
-  }
-  void selectCommunity(String communityId) {
-      _selectCommunityId = communityId;
-      notifyListeners();
-  }
+    void selectCommunity(String communityId) {
+        _selectCommunityId = communityId;
+        notifyListeners();
+    }
 
   
 }
@@ -245,12 +244,17 @@ class PostModel extends ConnectedCommunityModel{
     }  
   }
 
-  Future<bool> updateVote(int updatedVote)async{
+  Future<bool> updateVote(int updatedVote, int index)async{
+
+    if(updatedVote <= 0) updatedVote = 0;
+
     final Map<String,int> voteData = {
       'vote' : updatedVote,
     };
-    
-    final http.Response response =await http.patch('https://minireddit-1803c.firebaseio.com/posts/${selectedPostId}.json',
+    print('post vote .........');
+    print(_posts[index].id);
+
+    final http.Response response =await http.patch('https://minireddit-1803c.firebaseio.com/posts/${_posts[index].id}.json',
     body:json.encode(voteData));
 
     print(json.decode(response.body));
@@ -260,39 +264,59 @@ class PostModel extends ConnectedCommunityModel{
         return false;
     }
 
-    int index = _posts.indexWhere((Post post) {
-      return post.id == selectedPostId;
-    });
-
-    _posts[index].vote= json.decode(response.body);
+    _posts[index].vote= (json.decode(response.body))['vote'] ;
     
     notifyListeners();
 
     return true;   
   }
 
-  Future<Null> updateComment ()async{
+  Future<Null> updateComment (String content,int index)async{
+
     final Map<String,dynamic> data = {
-      'content':'First',
+      'content':content,
       'vote':0,
       'reply':"[]"
     };
     print('comment post start');
-    print(selectedPostId);
-     final http.Response response = await http.post('https://minireddit-1803c.firebaseio.com/posts/${selectedPostId}/comments.json',
+    try{
+      final http.Response response = await http.post('https://minireddit-1803c.firebaseio.com/posts/${_posts[index].id}/comments.json',
      body:json.encode(data));
      print(json.decode(response.body));
+     if(response.statusCode != 200 && response.statusCode != 201){
+        _isLoading=false;
+        notifyListeners();
+        return ;
+      }
+    final Map<String,dynamic> commentListData = json.decode(response.body);
+    if(commentListData == null){
+      notifyListeners();
+        return ;
+    }
+      final Comment comment = Comment(
+        content: content,
+        vote:0,
+        );
+        print('comment .........');
+        print(comment);
+    _posts[index].comments.add(comment);
+    notifyListeners();
+    return;
+    }catch(error){
+        notifyListeners();
+        return;
+    }
   }
 
  
 
   /////////////
   ///
-  Future<Null> fetchComment ()async{
+  Future<Null> fetchComment (int index)async{
   _isLoading = true;
   notifyListeners();
   try{
-    final http.Response response =await http.get('https://minireddit-1803c.firebaseio.com/posts/${selectedPostId}/comments.json');
+    final http.Response response =await http.get('https://minireddit-1803c.firebaseio.com/posts/${_posts[index].id}/comments.json');
     final List<Comment> fetchedComments = [];
     final Map<String,dynamic> commentListData = json.decode(response.body);
     if(commentListData == null){
@@ -301,8 +325,7 @@ class PostModel extends ConnectedCommunityModel{
       return ;
     }
 
-    commentListData.forEach((String commentId,dynamic data){
-      
+    commentListData.forEach((String commentId,dynamic data){    
       final Comment comment = Comment(
         id: commentId,
         content: data['content'],
@@ -311,7 +334,7 @@ class PostModel extends ConnectedCommunityModel{
         );
         fetchedComments.add(comment);
     });
-    _posts[selectedPostIndex].comments=(fetchedComments);
+    _posts[index].comments=(fetchedComments);
     _isLoading = false;
     notifyListeners();
   }    
@@ -392,6 +415,7 @@ class ChatModel extends ConnectedCommunityModel{
       fetchedMessages.add(message);
     });
     _messages = fetchedMessages;
+    notifyListeners();
     print('message');
     print(_messages);
     } 

@@ -24,16 +24,15 @@ class _PostListPage extends State<PostListPage>{
 
   Widget _buildCommentButton(context,int index,Function updateComment){
     return ScopedModelDescendant(builder: (BuildContext context,Widget child,MainModel model ){
-      model.selectPost(model.allPosts[index].id);
-    return FlatButton(
-        child: Icon(Icons.insert_comment),
-        onPressed: (){
-         updateComment().then((_)=>model.selectPost(null));
-         Navigator.push(context,MaterialPageRoute(builder: (BuildContext context)=> CommentPage(model)));
-        },
-    );
+      return FlatButton(
+          child: Icon(Icons.insert_comment),
+          onPressed: (){
+          Navigator.push(context,MaterialPageRoute(builder: (BuildContext context)=> CommentPage(model,index)));
+          },
+      );
 
-  });}
+      }
+    );}
 
   Widget _buildVoteUpButton(context,int index,Function updateVote){
     return ScopedModelDescendant(builder: (BuildContext context,Widget child,MainModel model ){
@@ -41,12 +40,13 @@ class _PostListPage extends State<PostListPage>{
       return IconButton(
         onPressed: (){
            print('voteUp');
+           print(model.allPosts[index].id);
           updateVote(
-            model.allPosts[index].vote + 1)
+            model.allPosts[index].vote + 1,index)
             .then((bool success){
               if( success)
                 {
-                  
+                  widget.model.fetchPost();    
                 }
               else{
               showDialog(
@@ -64,7 +64,7 @@ class _PostListPage extends State<PostListPage>{
                         );
                 });
               };
-        }).then((_)=>model.selectPost(null));
+        });
         },
       icon:Icon(Icons.arrow_upward)
     );
@@ -73,11 +73,10 @@ class _PostListPage extends State<PostListPage>{
   Widget _buildVoteDownButton(context,int index,Function updateVote){
     
     return ScopedModelDescendant(builder: (BuildContext context,Widget child,MainModel model ){
-      model.selectPost(model.allPosts[index].id);
       return IconButton(
         onPressed: (){
           updateVote(
-            model.allPosts[index].vote - 1,)
+            model.allPosts[index].vote - 1,index)
             .then((bool success){
               if( success)
                 { 
@@ -98,7 +97,7 @@ class _PostListPage extends State<PostListPage>{
                         );
                 });
     }
-    }).then((_)=>model.selectPost(null));
+    });
         },
       icon:Icon(Icons.arrow_downward)
     );
@@ -115,7 +114,7 @@ class _PostListPage extends State<PostListPage>{
         body:ScopedModelDescendant(builder:(BuildContext context, Widget child,MainModel model){
           return ListView.builder(
           itemBuilder: (BuildContext context,int index){
-            model.selectPost(null);
+            
             return Card(
               child:Column(children: <Widget>[
                 TitleDefault(model.allPosts[index].title),

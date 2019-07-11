@@ -6,7 +6,7 @@ class Post {
   final String communityid;
   String  title;
   var content;
-  num vote;
+  int vote;
   List<Comment> comments = [];
   
   Post({ this.id,@required this.communityid,@required this.title,@required this.content,@required this.vote, this.comments});
