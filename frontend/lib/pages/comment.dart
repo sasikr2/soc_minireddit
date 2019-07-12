@@ -21,32 +21,79 @@ class _CommentPage extends State<CommentPage>{
     super.initState();
   }
 
+  TextEditingController message = new TextEditingController();
+  
+
+  Widget _bar(BuildContext context) {
+    return AppBar(
+        title: new Text(
+          widget.model.selectedCommunity.name,
+        ),
+        centerTitle: true,
+      );
+  }
+  Widget buildList() {
+    return Flexible(
+      child: ListView.builder(
+        itemBuilder: (BuildContext context, int index){
+          return Padding(
+            padding:  const EdgeInsets.all(8.0),
+            child: Column(
+              children: <Widget>[
+                Text(widget.model.allPosts[widget.postIndex].comments[index].content),
+                Divider(),
+              ],
+            ),
+          );
+        },
+        itemCount: widget.model.allPosts[widget.postIndex].comments.length,
+        reverse: true,
+      ),
+    );
+  }
+
+  Widget buildInput() {
+    return Container(
+      child: Row(
+        children: <Widget>[
+          Flexible(
+            child: Container(
+              child: TextField(
+                controller: message,
+                decoration: InputDecoration.collapsed(
+                  hintText: 'Enter Comment'
+                ),
+              ),
+            ),
+          ),
+          FlatButton(
+            child: Icon(Icons.send),
+            onPressed: () {
+            widget.model.updateComment(message.text, widget.postIndex);
+            message.clear();
+            },
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return 
-       Scaffold(
-          appBar: AppBar(
-            title:Text('Comment')
-          ),
-          body:ScopedModelDescendant<MainModel>(builder: (BuildContext context,Widget child ,MainModel model){
-            if( model.allPosts[widget.postIndex].comments == null){
-              return Center(child: Text('No Comment'),);
-            }
-            return ListView.builder(
-            itemBuilder: (BuildContext context, int index){       
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(children: <Widget>[
-                    ListTile(
-                      title: Text(model.allPosts[widget.postIndex].comments[index].content),
-                    ),
-                    Divider(),
-                  ],
-              ),
-              );},
-            itemCount: model.allPosts[widget.postIndex].comments.length);}),
-            bottomNavigationBar: BottomAppBar(
-              child:RaisedButton(onPressed: () {
+    return Material(
+      child: Container(
+      child: Column(
+        children: <Widget>[
+          _bar(context),
+          buildList(),
+          buildInput(),
+        ],
+      )
+      
+            ),
+    );
+  }
+}
                 widget.model.updateComment('Hello comment',widget.postIndex);
                },
                 child: Text('Fixed Send'))
