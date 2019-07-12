@@ -1,5 +1,5 @@
 import '../model/community.dart';
-import '../pages/community-select.dart';
+import '../widgets/ui_elements/title_default.dart';
 import '../pages/posts-list.dart';
 import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -7,6 +7,8 @@ import 'create-community.dart';
 import '../scoped-model/main.dart';
 import 'community-list.dart';
 import 'create-post.dart';
+import '../pages/followed-community.dart';
+import '../pages/comment.dart';
 
 class CommunityHomePage extends StatefulWidget{
     final MainModel model;
@@ -21,7 +23,7 @@ class CommunityHomePage extends StatefulWidget{
 class _CommunityHomePage extends State<CommunityHomePage> {
   @override
   void initState() {
-    widget.model.fetchCommunity();
+    widget.model.fetchPost();
     super.initState();
   }
 
@@ -72,7 +74,8 @@ class _CommunityHomePage extends State<CommunityHomePage> {
           leading: Icon(Icons.search),
           title:Text('Find Community to follow'),
           onTap: (){
-            
+
+            Navigator.push(context,MaterialPageRoute(builder: (BuildContext context)=>CommunityFollowPage(widget.model)));
           },
         ),
         ListTile(
@@ -92,8 +95,93 @@ class _CommunityHomePage extends State<CommunityHomePage> {
   }
 
 
+Widget _buildCommentButton(context,int index,Function updateComment){
+    return ScopedModelDescendant(builder: (BuildContext context,Widget child,MainModel model ){
+      return FlatButton(
+          child: Icon(Icons.insert_comment),
+          onPressed: (){
+          Navigator.push(context,MaterialPageRoute(builder: (BuildContext context)=> CommentPage(model,index)));
+          },
+      );
+
+      }
+    );}
+
+  Widget _buildVoteUpButton(context,int index,Function updateVote){
+    return ScopedModelDescendant(builder: (BuildContext context,Widget child,MainModel model ){
+      return IconButton(
+        onPressed: (){
+           print('voteUp');
+           print(model.allPosts[index].id);
+          updateVote(
+            model.allPosts[index].vote + 1,index)
+            .then((bool success){
+              if( success)
+                {
+                  widget.model.fetchPost();    
+                }
+              else{
+              showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Something went wrong'),
+                          content: Text('Please try again!'),
+                          actions: <Widget>[
+                            FlatButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text('Okay'),
+                            )
+                          ],
+                        );
+                });
+              };
+        });
+        },
+      icon:Icon(Icons.arrow_upward)
+    );
+    });
+  }
+  Widget _buildVoteDownButton(context,int index,Function updateVote){
+    
+    return ScopedModelDescendant(builder: (BuildContext context,Widget child,MainModel model ){
+      return IconButton(
+        onPressed: (){
+          updateVote(
+            model.allPosts[index].vote - 1,index)
+            .then((bool success){
+              if( success)
+                { 
+                }
+              else{
+              showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Something went wrong'),
+                          content: Text('Please try again!'),
+                          actions: <Widget>[
+                            FlatButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: Text('Okay'),
+                            )
+                          ],
+                        );
+                });
+    }
+    });
+        },
+      icon:Icon(Icons.arrow_downward)
+    );
+    });
+  }
+
+  
+
+
   @override
   Widget build(BuildContext context) {
+    final double deviceWidth = MediaQuery.of(context).size.width;
     return Scaffold(
         drawer: _buildSideDrawer(context),
         appBar: AppBar(
@@ -116,22 +204,29 @@ class _CommunityHomePage extends State<CommunityHomePage> {
           icon: Icon(Icons.add),
           label: Text("New Community"),
         ),
-        body:ListView.builder(
-        itemBuilder: (BuildContext context, int index){
-           return Padding(
-             padding: const EdgeInsets.all(8.0),
-             child: Column(children: <Widget>[
-                GestureDetector(child: Text(widget.model.allCommunities[index].name),
-                onTap: (){
-                    Navigator.pop(context,widget.model.allCommunities[index]);
-                },),
-                Divider(),
-              ],
-          ),
-           );
-        },
-        itemCount: widget.model.allCommunities.length,
-      )
+        body:ScopedModelDescendant(builder:(BuildContext context, Widget child,MainModel model){
+          return ListView.builder(
+          itemBuilder: (BuildContext context,int index){
+            
+            return Card(
+              child:Column(children: <Widget>[
+                TitleDefault(model.allPosts[index].title),
+                Container(
+                  padding: EdgeInsets.only(top:10.0),
+                  child:Row(children: <Widget>[
+                    _buildVoteUpButton(context,index,model.updateVote),
+                    Text(model.allPosts[index].vote.toString()),
+                    _buildVoteDownButton(context, index, model.updateVote),
+                    SizedBox(width:deviceWidth-226.9),
+                    _buildCommentButton(context,index,model.updateComment),
+                  ],)
+                )
+              ],)
+            );
+          },
+          itemCount: model.allPosts.length,
         );
+        })
+      );
   }
 }

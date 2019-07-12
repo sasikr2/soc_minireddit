@@ -376,6 +376,9 @@ class ChatModel extends ConnectedCommunityModel{
           notifyListeners();
           return;
       }
+
+      Map<String,dynamic> messageListData = json.decode(response.body);
+      _messages.add(message);
       //print(json.decode(response.body));
       //List<String> localuserchatId = _userchatId.where((value) => value != _authenticatedUser.usercreatedId);
         print('Hell ..........');

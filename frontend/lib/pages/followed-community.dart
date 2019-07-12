@@ -5,17 +5,18 @@ import 'package:scoped_model/scoped_model.dart';
 import '../model/community.dart';
 import '../scoped-model/main.dart';
 
-class CommunityListPage extends StatefulWidget{
+class CommunityFollowPage extends StatefulWidget{
 
-  final MainModel model;
-  CommunityListPage(this.model);
+  MainModel model;
+  CommunityFollowPage(this.model);
+
   @override
   State<StatefulWidget> createState() {
-    return _CommunityListPage();
+    return _CommunityFollowPage();
   }
 }
 
-class _CommunityListPage extends State<CommunityListPage>{
+class _CommunityFollowPage extends State<CommunityFollowPage>{
 
   @override
   void initState() {
@@ -37,7 +38,9 @@ class _CommunityListPage extends State<CommunityListPage>{
              padding: const EdgeInsets.all(8.0),
              child: Column(children: <Widget>[
                 ListTile(
-                  title: Text(model.allCommunities[index].name),
+                  title:Row(children: <Widget>[Text(model.allCommunities[index].name,)
+                  ,FlatButton(onPressed: (){},
+                  child:Text('follow'),)]),
                   subtitle: Text(model.allCommunities[index].about),
                 ),
                 Divider(),
