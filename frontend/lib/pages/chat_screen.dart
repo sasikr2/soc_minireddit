@@ -21,32 +21,79 @@ class _ChatScreenState extends State<ChatScreen> {
     widget.model.fetchMessage();
     super.initState();
   }
+
+  TextEditingController message = new TextEditingController();
   
-  Widget _drawer(BuildContext context) {
-    return Drawer(
-      child: Column(
-        children: <Widget>[
-          UserAccountsDrawerHeader(
-            accountEmail: null,
-            accountName: Text("Random"),
-            currentAccountPicture: CircleAvatar(
-              child: Text("R"),
+
+  Widget _bar(BuildContext context) {
+    return AppBar(
+        title: new Text(
+          widget.model.user.randId,
+        ),
+        centerTitle: true,
+      );
+  }
+  Widget buildList() {
+    return Flexible(
+      child: ListView.builder(
+        itemBuilder: (BuildContext context, int index){
+          return Padding(
+            padding:  const EdgeInsets.all(8.0),
+            child: Column(
+              children: <Widget>[
+                Text(widget.model.allMessages[index]),
+                Divider(),
+              ],
             ),
-          ),
-          ListTile(
-            leading: Icon(Icons.arrow_back),
-            title: Text("Return to Main Page"),
-            onTap: () {
-              //SchedulerBinding.instance.addPersistentFrameCallback( (callback) {
-              Navigator.pushReplacementNamed(context, '/chat_home');
-              //});  
-            }
-          )
-        ]
+          );
+        },
+        itemCount: widget.model.allMessages.length,
+        reverse: true,
       ),
     );
   }
 
+  Widget buildInput() {
+    return Container(
+      child: Row(
+        children: <Widget>[
+          Flexible(
+            child: Container(
+              child: TextField(
+                controller: message,
+                decoration: InputDecoration.collapsed(
+                  hintText: 'Enter message'
+                ),
+              ),
+            ),
+          ),
+          FlatButton(
+            child: Icon(Icons.send),
+            onPressed: () {
+            widget.model.sendMessage(message.text);
+            message.clear();},
+          )
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      child: Container(
+      child: Column(
+        children: <Widget>[
+          _bar(context),
+          buildList(),
+          buildInput(),
+        ],
+      )
+      
+            ),
+    );
+  }
+}
   Widget _bar(BuildContext context) {
     return AppBar(
         title: new Text(
